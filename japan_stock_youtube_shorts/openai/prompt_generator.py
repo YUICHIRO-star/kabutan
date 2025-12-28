@@ -90,14 +90,15 @@ class PromptGenerator:
             temperature=0.6,
         )
         return response.choices[0].message.content or ""
-     def generate_script(self, context: PromptContext, stock_summary: str) -> str:
-         prompt = self.build_script_prompt(context, stock_summary)
+    
+    def generate_script(self, context: PromptContext, stock_summary: str) -> str:
+        prompt = self.build_script_prompt(context, stock_summary)
          
-         system = (
-             "You are a Japanese equity analyst focused on long-term thinking. "
-             "You do not exaggerate or hype stock movements. "
-             "You clearly distinguish between factual price movements and interpretation. "
-             "Your goal is to help viewers think better about stocks, not to give buy/sell advice."
+        system = (
+            "You are a Japanese equity analyst focused on long-term thinking. "
+            "You do not exaggerate or hype stock movements. "
+            "You clearly distinguish between factual price movements and interpretation. "
+            "Your goal is to help viewers think better about stocks, not to give buy/sell advice."
          )
          
          return self.complete(system, [{"role": "user", "content": prompt}])
