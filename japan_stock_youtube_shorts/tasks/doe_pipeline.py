@@ -56,17 +56,17 @@ def insert_into_notion_video_artifacts(content: str) -> None:
     notion = Client(auth=notion_token)
 
     page = notion.pages.create(
-        parent={"database_id": database_id},
-        properties={
-            "Name": {"title": [{"text": {"content": "DOE_script_2025-09-01"}}]},
-            "artifact_id": {"rich_text": [{"text": {"content": "VID2025-09-001_script_v1"}}]},
-            "artifact_type": {"select": {"name": "script"}}},
-            "content": {"rich_text": [{"text": {"content": content}}]},
-            "status": {"status": {"name": "generated"}}},
-            "version": {"number": 1}},
-            "video_id": {"rich_text": [{"text": {"content": "VID2025-09-001"}}]},
-        },
-    )
+    parent={"database_id": database_id},
+    properties={
+        "Name": {"title": [{"text": {"content": "DOE_script_2025-09-01"}}]},
+        "artifact_id": {"rich_text": [{"text": {"content": "VID2025-09-001_script_v1"}}]},
+        "artifact_type": {"select": {"name": "script"}},
+        "content": {"rich_text": [{"text": {"content": content}}]},
+        "status": {"status": {"name": "generated"}},
+        "version": {"number": 1},
+        "video_id": {"rich_text": [{"text": {"content": "VID2025-09-001"}}]},
+    },
+)
 
     print("=== Task2: Notion登録完了 ===")
     print(f"Notion URL: {page['url']}")
