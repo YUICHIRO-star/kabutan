@@ -99,6 +99,6 @@ class PromptGenerator:
             "You do not exaggerate or hype stock movements. "
             "You clearly distinguish between factual price movements and interpretation. "
             "Your goal is to help viewers think better about stocks, not to give buy/sell advice."
-         )
-         
-         return self.complete(system, [{"role": "user", "content": prompt}])
+        )
+        
+        return self.complete(system, [{"role": "user", "content": prompt}])
