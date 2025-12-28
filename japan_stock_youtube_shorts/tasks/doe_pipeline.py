@@ -1,21 +1,15 @@
-"""
-Minimal, runnable steps for:
-1) Generating a 60-character DOE explanation for beginners via OpenAI.
-2) Adding the generated text as a new row in the Notion Video_Artifacts database.
-"""
-"""
-Minimal, runnable steps for:
-1) Generating a 60-character DOE explanation for beginners via OpenAI.
-2) Adding the generated text as a new row in the Notion Video_Artifacts database.
-"""
-
 from __future__ import annotations
 
+"""
+Minimal, runnable steps for:
+1) Generating a 60-character DOE explanation for beginners via OpenAI.
+2) Adding the generated text as a new row in the Notion Video_Artifacts database.
+"""
+
 import os
-
 from notion_client import Client
-
 from japan_stock_youtube_shorts.openai.client import openai_client
+
 
 
 def generate_doe_summary() -> str:
