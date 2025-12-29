@@ -6,8 +6,8 @@ Minimal, runnable steps for:
 from __future__ import annotations
 
 import os
+from notion_client import Client
 from japan_stock_youtube_shorts.openai.client import openai_client
-from japan_stock_youtube_shorts.notion.updater import update_property
 
 
 def generate_doe_summary() -> str:
@@ -27,17 +27,47 @@ def generate_doe_summary() -> str:
     return response.choices[0].message.content.strip()
 
 
-def main() -> None:
-    page_id = os.environ["NOTION_PAGE_ID"]
-    text = generate_doe_summary()
+def insert_new_page(content: str, version: int) -> None:
+    notion = Client(auth=os.environ["NOTION_API_KEY"])
+    database_id = os.environ["NOTION_DATABASE_ID"]
 
-    update_property(
-        page_id=page_id,
-        property_name="Content",
-        value={"rich_text": [{"text": {"content": text}}]},
+    page = notion.pages.create(
+        parent={"database_id": database_id},
+        properties={
+            "Name": {
+                "title": [
+                    {"text": {"content": f"DOE_script_v{version}"}}
+                ]
+            },
+            "artifact_id": {
+                "rich_text": [
+                    {"text": {"content": f"DOE_script_v{version}"}}
+                ]
+            },
+            "artifact_type": {
+                "select": {"name": "script"}
+            },
+            "Content": {
+                "rich_text": [
+                    {"text": {"content": content}}
+                ]
+            },
+            "Status": {
+                "status": {"name": "generated"}
+            },
+            "Version": {
+                "number": version
+            },
+        },
     )
 
-    print("DOE summary written to Notion.")
+    print(f"New DOE script page created: {page['url']}")
+
+
+def main() -> None:
+    version = 1  # ← 次は 2, 3 と手で増やす
+    text = generate_doe_summary()
+    insert_new_page(text, version)
 
 
 if __name__ == "__main__":
