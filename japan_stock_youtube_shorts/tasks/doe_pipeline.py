@@ -5,15 +5,12 @@ Minimal, runnable steps for:
 """
 from __future__ import annotations
 import os
-from notion_client import Client
-from japan_stock_youtube_shorts.openai.client import openai_client
 
+from japan_stock_youtube_shorts.openai.client import openai_client
+from japan_stock_youtube_shorts.notion.updater import update_property, update_status
 
 
 def generate_doe_summary() -> str:
-    """
-    Task 1: Call OpenAI (gpt-4o-mini) to produce a 60-character beginner-friendly DOE blurb.
-    """
     client = openai_client()
 
     messages = [
@@ -39,36 +36,20 @@ def generate_doe_summary() -> str:
     return text
 
 
-def insert_into_notion_video_artifacts(content: str) -> None:
-    """
-    Task 2: Add a new row to the Video_Artifacts DB with the generated content.
-    """
-    notion_token = os.environ["NOTION_API_KEY"]
-    database_id = os.environ["NOTION_DATABASE_ID"]
-    notion = Client(auth=notion_token)
-
-    page = notion.pages.create(
-    parent={"database_id": database_id},
-    properties={
-        "Name": {"title": [{"text": {"content": "DOE_script_2025-09-01"}}]},
-        "artifact_id": {"rich_text": [{"text": {"content": "VID2025-09-001_script_v1"}}]},
-        "artifact_type": {"select": {"name": "script"}},
-        "content": {"rich_text": [{"text": {"content": content}}]},
-        "status": {"status": {"name": "generated"}},
-        "version": {"number": 1},
-        "video_id": {"rich_text": [{"text": {"content": "VID2025-09-001"}}]},
-    },
-)
-
-    print("=== Task2: Notion登録完了 ===")
-    print(f"Notion URL: {page['url']}")
+def record_doe_script(page_id: str, content: str) -> None:
+    update_property(
+        page_id,
+        "Content",
+        {"rich_text": [{"text": {"content": content}}]},
+    )
+    update_status(page_id, "generated")
 
 
 def main() -> None:
+    page_id = os.environ["NOTION_PAGE_ID"]
     generated = generate_doe_summary()
-    insert_into_notion_video_artifacts(generated)
+    record_doe_script(page_id, generated)
 
 
 if __name__ == "__main__":
     main()
-
