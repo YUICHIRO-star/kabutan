@@ -39,12 +39,12 @@ def insert_new_page(content: str, version: int) -> None:
                     {"text": {"content": f"DOE_script_v{version}"}}
                 ]
             },
-            "artifact_id": {
+            "Artifact_id": {
                 "rich_text": [
                     {"text": {"content": f"DOE_script_v{version}"}}
                 ]
             },
-            "artifact_type": {
+            "Artifact_type": {
                 "select": {"name": "script"}
             },
             "Content": {
