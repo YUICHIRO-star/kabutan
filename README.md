@@ -43,3 +43,8 @@ Common flags:
 - `--dry-run` to avoid external API calls and writes (returns placeholders).
 - `--run-id <id>` to pin artifact names to a specific identifier.
 - `--log-level DEBUG` for verbose logging.
+
+### Automation
+- CI (`.github/workflows/ci.yml`): runs compile checks on push/PR and nightly.
+- DOE sample pipeline (`.github/workflows/run-doe-pipeline.yml`): can be run manually or nightly to generate a short DOE explanation via OpenAI and add it to the Notion Video_Artifacts database  
+  (requires `OPENAI_API_KEY`, `NOTION_API_KEY`, `NOTION_DATABASE_ID` secrets).
