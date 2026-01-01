@@ -45,33 +45,19 @@ class PromptGenerator:
     prompt = (
         f"あなたは『株鍛（かぶたん）』というコンセプトで、"
         f"視聴者の投資思考を鍛える短編解説動画の台本を作成します。\n\n"
-
-        f"【対象銘柄】\n"
-        f"{context.ticker}（{context.company_name}）\n\n"
-
-        f"【対象期間】\n"
-        f"{context.timeframe}\n\n"
-
-        f"【事実（価格データの要約）】\n"
-        f"{stock_summary}\n\n"
-
+        f"【対象銘柄】\n{context.ticker}（{context.company_name}）\n\n"
+        f"【対象期間】\n{context.timeframe}\n\n"
+        f"【事実（価格データの要約）】\n{stock_summary}\n\n"
         "【解説方針】\n"
-        "- 起きた事実と、それに対する解釈を分けて説明してください\n"
-        "- 値動きを『良い・悪い』で断定しないでください\n"
-        "- この動きが投資家心理や市場参加者の行動として"
-        "どう読めるかを説明してください\n"
-        "- 短期的な値動きの限界にも必ず触れてください\n\n"
-
-        "【出力要件】\n"
-        "- 60〜90秒のYouTube Shorts向け台本\n"
-        "- 冒頭は『問い』や『違和感』から始める\n"
-        "- 最後に次のCTAを自然に含める\n\n"
-
+        "- 起きた事実と解釈を分けて説明する\n"
+        "- 値動きを断定しない\n"
+        "- 投資家心理としてどう読めるかに触れる\n\n"
         f"CTA:\n{context.call_to_action}\n"
     )
 
-    logger.debug("Built script prompt (kabutan style): %s", prompt)
+    logger.debug("Built script prompt: %s", prompt)
     return prompt
+
 
 
     @retry_with_backoff(attempts=4)
