@@ -46,4 +46,5 @@ Common flags:
 
 ### Automation
 - CI (`.github/workflows/ci.yml`): runs compile checks on push/PR and nightly.
-- DOE sample pipeline (`.github/workflows/run-doe-pipeline.yml`): can be run manually or nightly to generate a 60字 DOE説明文 via OpenAI and add it to the Notion Video_Artifacts database (requires `OPENAI_API_KEY`, `NOTION_API_KEY`, `NOTION_DATABASE_ID` secrets).
+- DOE sample pipeline (`.github/workflows/run-doe-pipeline.yml`): can be run manually or nightly to generate a short DOE explanation via OpenAI and add it to the Notion Video_Artifacts database  
+  (requires `OPENAI_API_KEY`, `NOTION_API_KEY`, `NOTION_DATABASE_ID` secrets).

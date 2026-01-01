@@ -41,19 +41,38 @@ class PromptGenerator:
             self.client = openai_client(api_key)
 
     def build_script_prompt(self, context: PromptContext, stock_summary: str) -> str:
-        """Construct a prompt instructing the model to create a narration."""
-        prompt = (
-            f"あなたは日本株の最新情報を発信する台本作成の専門家です。\n"
-            f"銘柄: {context.ticker} ({context.company_name})\n"
-            f"期間: {context.timeframe}\n"
-            f"トーン: {context.style}\n"
-            f"株価サマリー:\n{stock_summary}\n\n"
-            "60〜90秒のショート動画向け台本をMarkdownで作成してください。"
-            " 冒頭は視聴者を引き込むフックから始め、最後に以下のCTAを含めてください:\n"
-            f"{context.call_to_action}\n"
-        )
-        logger.debug("Built script prompt: %s", prompt)
-        return prompt
+    """Construct a prompt instructing the model to create a narration."""
+    prompt = (
+        f"あなたは『株鍛（かぶたん）』というコンセプトで、"
+        f"視聴者の投資思考を鍛える短編解説動画の台本を作成します。\n\n"
+
+        f"【対象銘柄】\n"
+        f"{context.ticker}（{context.company_name}）\n\n"
+
+        f"【対象期間】\n"
+        f"{context.timeframe}\n\n"
+
+        f"【事実（価格データの要約）】\n"
+        f"{stock_summary}\n\n"
+
+        "【解説方針】\n"
+        "- 起きた事実と、それに対する解釈を分けて説明してください\n"
+        "- 値動きを『良い・悪い』で断定しないでください\n"
+        "- この動きが投資家心理や市場参加者の行動として"
+        "どう読めるかを説明してください\n"
+        "- 短期的な値動きの限界にも必ず触れてください\n\n"
+
+        "【出力要件】\n"
+        "- 60〜90秒のYouTube Shorts向け台本\n"
+        "- 冒頭は『問い』や『違和感』から始める\n"
+        "- 最後に次のCTAを自然に含める\n\n"
+
+        f"CTA:\n{context.call_to_action}\n"
+    )
+
+    logger.debug("Built script prompt (kabutan style): %s", prompt)
+    return prompt
+
 
     @retry_with_backoff(attempts=4)
     def complete(self, system: str, messages: List[Dict[str, str]]) -> str:
@@ -74,5 +93,8 @@ class PromptGenerator:
     def generate_script(self, context: PromptContext, stock_summary: str) -> str:
         """End-to-end helper to create a script from context + summary."""
         prompt = self.build_script_prompt(context, stock_summary)
-        system = "You are a helpful assistant that writes short, engaging scripts in Japanese."
+        system = ( "You are a Japanese equity analyst focused on long-term thinking. " 
+                  "You do not exaggerate or hype stock movements. "
+                  "You clearly distinguish between factual price movements and interpretation. "
+                  "Your goal is to help viewers think better about stocks, not to give buy/sell advice." )
         return self.complete(system, [{"role": "user", "content": prompt}])

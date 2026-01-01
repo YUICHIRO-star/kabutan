@@ -1,24 +1,24 @@
 """
 Minimal, runnable steps for:
-1) Generating a 60-character DOE explanation for beginners via OpenAI.
+1) Generating a beginner-friendly DOE explanation via OpenAI.
 2) Adding the generated text as a new row in the Notion Video_Artifacts database.
 """
 
 from __future__ import annotations
 
 import os
-
 from notion_client import Client
-from openai import OpenAI
+
+from japan_stock_youtube_shorts.openai.client import openai_client
 
 
 def generate_doe_summary() -> str:
     """
-    Task 1: Call OpenAI (gpt-4o-mini) to produce a 60-character beginner-friendly DOE blurb.
-    Prints the result and returns it.
+    OpenAI を使って、株初心者向けに
+    DOE（株主還元指標）を60字以内で説明する。
     """
-    api_key = os.environ["OPENAI_API_KEY"]
-    client = OpenAI(api_key=api_key)
+    client = openai_client()
+
     messages = [
         {
             "role": "system",
@@ -26,47 +26,68 @@ def generate_doe_summary() -> str:
         },
         {
             "role": "user",
-            "content": "DOEを株初心者向けに60字で説明してください。必ず60字以内の日本語で。",
+            "content": "DOEを株初心者向けに60字以内の日本語で説明してください。",
         },
     ]
-    response = client.chat.completions.create(model="gpt-4o-mini", messages=messages, temperature=0.4)
-    text = response.choices[0].message.content.strip()
-    print("=== Task1: OpenAI生成結果 ===")
-    print(text)
-    return text
+
+    response = client.chat.completions.create(
+        model="gpt-4o-mini",
+        messages=messages,
+        temperature=0.4,
+    )
+
+    return response.choices[0].message.content.strip()
 
 
-def insert_into_notion_video_artifacts(content: str) -> None:
+def insert_new_page(content: str, version: int) -> None:
     """
-    Task 2: Add a new row to the Video_Artifacts DB with the generated content.
-    Prints the created Notion URL on success.
+    生成した DOE 説明文を
+    Notion の Video_Artifacts データベースに1行追加する。
     """
-    notion_token = os.environ["NOTION_API_KEY"]
+    notion = Client(auth=os.environ["NOTION_API_KEY"])
     database_id = os.environ["NOTION_DATABASE_ID"]
-    notion = Client(auth=notion_token)
 
     page = notion.pages.create(
         parent={"database_id": database_id},
         properties={
-            # Title property (Notion requires at least one title field)
-            "Name": {"title": [{"text": {"content": "DOE_script_2025-09-01"}}]},
-            "artifact_id": {"rich_text": [{"text": {"content": "VID2025-09-001_script_v1"}}]},
-            "artifact_type": {"select": {"name": "script"}},
-            "content": {"rich_text": [{"text": {"content": content}}]},
-            "status": {"status": {"name": "generated"}},
-            "version": {"number": 1},
-            "video_id": {"rich_text": [{"text": {"content": "VID2025-09-001"}}]},
+            "Name": {
+                "title": [
+                    {"text": {"content": f"DOE_script_v{version}"}}
+                ]
+            },
+            "artifact_id": {
+                "rich_text": [
+                    {"text": {"content": f"DOE_script_v{version}"}}
+                ]
+            },
+            "artifact_type": {
+                "select": {"name": "script"}
+            },
+            "content": {
+                "rich_text": [
+                    {"text": {"content": content}}
+                ]
+            },
+            "status": {
+                "status": {"name": "generated"}
+            },
+            "version": {
+                "number": version
+            },
         },
     )
 
-    print("=== Task2: Notion登録完了 ===")
-    print(f"Notion URL: {page['url']}")
+    print(f"New DOE script page created: {page['url']}")
+
+
+def main() -> None:
+    """
+    ローカル実行・GitHub Actions のどちらからも呼べるエントリポイント。
+    """
+    version = 1  # 次回以降は 2, 3 とインクリメント
+    text = generate_doe_summary()
+    insert_new_page(text, version)
 
 
 if __name__ == "__main__":
-    """
-    Run the two tasks sequentially.
-    - Requires OPENAI_API_KEY, NOTION_API_KEY, NOTION_DATABASE_ID to be set.
-    """
-    generated = generate_doe_summary()
-    insert_into_notion_video_artifacts(generated)
+    main()
